@@ -25,9 +25,17 @@ exitaudit compare examples/source examples/target --out outputs/check
 
 The synthetic example contains a renamed attachment, a missing page and a lost CSV row. The command intentionally exits with status 1 and writes the findings to `report.json` and `report.html`.
 
-Markdown and CSV files are paired by exact relative path. Other files may be recognised as renamed only when their SHA-256 hash has exactly one matching missing source and one added destination. Ambiguous matches stay unresolved. CSV comparison accounts for duplicate rows and column order; UTF-8 with or without BOM is accepted.
+CSV comparison accounts for duplicate rows and column order; UTF-8 with or without BOM is accepted.
 
 Reports are local JSON and self-contained HTML. Exit status is 0 for a pass, 1 for findings, and 2 for an input or runtime setup error. Commands do not publish reports or contact a model API.
+
+## Input and runtime details
+
+Paths are matched using Unicode NFC, while file access retains the original spelling. NFC/NFD and case collisions are reported as unverified. Markdown hashes ignore CRLF versus LF. Unique identical-content pairs can identify renamed documents and attachments. A trailing 32-digit Notion export ID can also be removed for an unambiguous filename pair; changed content remains a finding. Ambiguous matches stay unresolved.
+
+Link parsing splits URLs before decoding their paths, so `Issue%20%231.md` resolves to `Issue #1.md`. Inline code, backtick or tilde fences and indented code lines are excluded. The parser handles common export syntax; full CommonMark parsing, nested parentheses and anchors remain outside scope.
+
+CSV readers accept trailing blank lines and cells up to the 64 MiB file budget. Duplicate rows still count separately. CSV file byte changes are flagged even when row comparison finds no loss.
 
 ## Boundaries
 
@@ -45,6 +53,6 @@ python -m pytest -q
 
 Tests cover missing files, exact attachment renames, ambiguous matches, duplicate CSV rows, UTF-8 BOM, invalid text, escaping links and unsafe paths. No external runtime is required.
 
-GitHub Actions runs tests on Windows and Linux. Integration jobs use synthetic local fixtures. No deployment or package publication workflow is configured. Dependency installation and browser/image downloads are explicit setup steps that contact their respective package providers.
+GitHub Actions runs tests on Windows and Linux. Tests use synthetic local fixtures. No deployment or package publication workflow is configured. Dependency installation is an explicit setup step that contacts package providers.
 
 See [DESIGN.md](DESIGN.md) for the scope decisions and [SECURITY.md](SECURITY.md) for data handling.

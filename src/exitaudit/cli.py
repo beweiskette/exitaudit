@@ -17,4 +17,4 @@ def main(argv=None):
         print(json.dumps({'status': result['status'], 'missing': len(result['missing']), 'changed': len(result['changed'])}))
         return 0 if result['status'] == 'pass' else 1
     except (ValueError, OSError) as exc:
-        parser.exit(2, f'Cannot compare exports ({type(exc).__name__}). Check local paths and permissions.\n')
+        parser.exit(2, f'Cannot compare exports : {exc}. Check local paths and permissions.\n')

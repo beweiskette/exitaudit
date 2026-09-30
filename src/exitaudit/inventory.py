@@ -1,14 +1,20 @@
 import hashlib
 import os
+import unicodedata
 from .safeio import local_path
 
 MAX_FILE = 64 * 1024 * 1024
+
+class FileIndex(dict):
+    def __init__(self):
+        super().__init__()
+        self.paths = {}
 
 def inventory(directory):
     root = local_path(directory)
     if not root.is_dir():
         raise ValueError('An export directory is required')
-    files, errors, folded = {}, [], {}
+    files, errors, folded = FileIndex(), [], {}
     def walk(folder):
         try:
             entries = sorted(os.scandir(folder), key=lambda e: e.name)
@@ -17,7 +23,7 @@ def inventory(directory):
             return
         for entry in entries:
             path = folder / entry.name
-            relative = path.relative_to(root).as_posix()
+            relative = unicodedata.normalize('NFC', path.relative_to(root).as_posix())
             try:
                 local_path(path)
                 if path.is_dir():
@@ -27,12 +33,13 @@ def inventory(directory):
                     raise ValueError('unsupported-or-large-file')
                 if relative.casefold() in folded:
                     errors.append({'file': relative, 'reason': 'case-collision'})
+                    continue
                 folded[relative.casefold()] = relative
-                digest = hashlib.sha256()
-                with path.open('rb') as stream:
-                    for chunk in iter(lambda: stream.read(65536), b''):
-                        digest.update(chunk)
-                files[relative] = digest.hexdigest()
+                data = path.read_bytes()
+                if relative.lower().endswith(('.md', '.markdown')):
+                    data = data.replace(b'\r\n', b'\n')
+                files[relative] = hashlib.sha256(data).hexdigest()
+                files.paths[relative] = path
             except (ValueError, OSError):
                 errors.append({'file': relative, 'reason': 'unsafe-or-unreadable-file'})
     walk(root)

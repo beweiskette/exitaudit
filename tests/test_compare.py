@@ -35,12 +35,12 @@ def test_ambiguous_hashes_not_treated_as_success(tmp_path):
     assert result['renamed'] == []
     assert result['ambiguous'] == ['x.bin']
 
-def test_links_cannot_escape_and_markdown_not_renamed_by_hash(tmp_path):
+def test_links_cannot_escape_even_when_markdown_is_renamed(tmp_path):
     a, b = tmp_path / 'a', tmp_path / 'b'
     write(a, 'page.md', '[x](../private.txt)\n')
     write(b, 'page2.md', '[x](../private.txt)\n')
     result = compare(a, b)
-    assert result['missing'] == ['page.md']
+    assert result['renamed'] == [{'from': 'page.md', 'to': 'page2.md'}]
     assert result['broken_links'][0]['reason'] == 'outside-export'
 
 def test_clean_and_invalid_utf8(tmp_path):

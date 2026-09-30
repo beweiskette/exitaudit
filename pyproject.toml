@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "exitaudit"
 version = "0.1.0"
-description = "Local, explicit verification for developers"
+description = "Audit Markdown and CSV migrations for missing content and broken local links"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
@@ -20,9 +20,9 @@ exitaudit = "exitaudit.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-installreceipt = ["scripts/*.ps1"]
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = ["integration: requires Docker or a Chromium browser"]
+
+[project.urls]
+Repository = "https://github.com/beweiskette/exitaudit"

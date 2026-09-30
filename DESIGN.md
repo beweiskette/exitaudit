@@ -1,16 +1,14 @@
-# Version 0.1 design
+# Design
 
-Compare a Markdown/CSV export with its migrated folder and identify missing files, changed content, broken local links and lost table rows.
+Audit Markdown and CSV migrations for missing content and broken local links.
 
-The design was reviewed once through a read-only Claude adapter before implementation. That consultation received feature proposals and synthetic examples, not repository contents or credentials. Implementation and local verification were performed separately; the consultation was a design review, not a code audit.
+Paths are matched using Unicode NFC, while file access retains the original spelling. NFC/NFD and case collisions are reported as unverified. Markdown hashes ignore CRLF versus LF. Unique identical-content pairs can identify renamed documents and attachments. A trailing 32-digit Notion export ID can also be removed for an unambiguous filename pair; changed content remains a finding. Ambiguous matches stay unresolved.
 
-The selected scope favours explicit user contracts and local evidence. Automatic uploads, model-generated pass criteria, background monitoring and publishing are excluded. This version makes no claim that the idea is unique or that it will attract a particular number of GitHub stars.
+Link parsing splits URLs before decoding their paths, so `Issue%20%231.md` resolves to `Issue #1.md`. Inline code, backtick or tilde fences and indented code lines are excluded. The parser handles common export syntax; full CommonMark parsing, nested parentheses and anchors remain outside scope.
 
-## Acceptance evidence
+CSV readers accept trailing blank lines and cells up to the 64 MiB file budget. Duplicate rows still count separately. CSV file byte changes are flagged even when row comparison finds no loss.
 
-Tests cover missing files, exact attachment renames, ambiguous matches, duplicate CSV rows, UTF-8 BOM, invalid text, escaping links and unsafe paths. No external runtime is required.
-
-## Deliberate limits
+## Scope
 
 Files are read locally. No APIs, uploads or external link requests are used. Reports include relative filenames, counts and findings, but omit document text, CSV values and link URLs. Filenames may still be confidential.
 
