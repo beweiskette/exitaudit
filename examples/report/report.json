@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "status": "attention",
+  "source_count": 4,
+  "target_count": 3,
+  "missing": [
+    "missing.md"
+  ],
+  "changed": [
+    "index.md",
+    "records.csv"
+  ],
+  "added": [],
+  "renamed": [
+    {
+      "from": "photo.bin",
+      "to": "renamed.bin"
+    }
+  ],
+  "ambiguous": [],
+  "csv": [
+    {
+      "file": "records.csv",
+      "lost_columns": 0,
+      "added_columns": 0,
+      "lost_rows": 1,
+      "added_rows": 0
+    }
+  ],
+  "broken_links": [
+    {
+      "file": "index.md",
+      "link": 2,
+      "reason": "missing-target"
+    }
+  ],
+  "unverified": [],
+  "scope": "Files, common Markdown links and CSV rows. Formatting, HTML links and remote destinations are not verified."
+}
